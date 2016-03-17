@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+# SharpDevelop 5.1
+VisualStudioVersion = 12.0.20827.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectrumAnalyzerClient", "SpectrumAnalyzerClient.csproj", "{F4F78BCA-CA46-40A0-AF32-9A27A821078F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectrumAnalyzerService", "..\AnalyzerAccessor\SpectrumAnalyzerService.csproj", "{117E7EC4-FD80-40CD-8DA0-F08928295EFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4F78BCA-CA46-40A0-AF32-9A27A821078F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4F78BCA-CA46-40A0-AF32-9A27A821078F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4F78BCA-CA46-40A0-AF32-9A27A821078F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4F78BCA-CA46-40A0-AF32-9A27A821078F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{117E7EC4-FD80-40CD-8DA0-F08928295EFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{117E7EC4-FD80-40CD-8DA0-F08928295EFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{117E7EC4-FD80-40CD-8DA0-F08928295EFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{117E7EC4-FD80-40CD-8DA0-F08928295EFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
