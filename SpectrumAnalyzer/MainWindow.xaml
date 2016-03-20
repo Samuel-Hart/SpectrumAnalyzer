@@ -13,21 +13,9 @@
 			<RowDefinition />
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition
-				Width="0.499999999999999*" />
+			<ColumnDefinition Width="0.499999999999999*" />
 		</Grid.ColumnDefinitions>
-		<Ellipse
-			Fill="#00FFFFFF"
-			Stroke="#FF000000"
-			StrokeThickness="2"
-			Width="144"
-			Height="138"
-			Grid.Column="0"
-			Grid.Row="0"
-			HorizontalAlignment="Left"
-			VerticalAlignment="Top"
-			Margin="53,59,0,0" />
-	</Grid>
+    </Grid>
 	<Controls:MetroWindow.RightWindowCommands>
 		<Controls:WindowCommands>
 			<Button
