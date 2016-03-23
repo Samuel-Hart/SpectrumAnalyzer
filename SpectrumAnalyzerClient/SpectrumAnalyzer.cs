@@ -1,6 +1,5 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Linq;
 using System.Drawing;
 using System.IO;
 using System.Threading;
@@ -12,14 +11,17 @@ namespace SpectrumAnalyzer
 	/// <summary>
 	/// Description of MainForm.
 	/// </summary>
-	public partial class SpectrumAnalyzerViewController : Form
+	public partial class SpectrumAnalyzer : Form
     {
 		IntPtr hDongle;
 		Thread Read_Data;
+		//Thread Write_Data;
 		
-		public SpectrumAnalyzerViewController()
+		private string outputFilePath = string.Empty;
+		
+		public SpectrumAnalyzer()
         {
-        	InitializeComponent();
+			InitializeComponent();
         }
 
         void Label_Initialize()
@@ -27,14 +29,16 @@ namespace SpectrumAnalyzer
             lblFREQ.Text = "Center Frequency(MHz)";
             lblSTEP.Text = "Step(kHz)";
             lblRBW.Text = "RBW";
-            lblPOINTS.Text = "Point Number";
+            lblPOINTS.Text = "Number of Points";
             lblAMP.Text = "Amplitude";
             lblSWEEPTIME.Text = "Sweep Time";
+            lblOutputDir.Text = "No Directory Selected:  Select a valid output directory to enable start button";
+            lblOutputDir.TextAlign = ContentAlignment.MiddleCenter;
         }
 
         void ComboBox_Initialize()
         {
-            cboRBW.Items.Add("50M");
+            cboRBW.Items.Add( "50M");
             cboRBW.Items.Add("100M");
             cboRBW.Items.Add("200M");
             cboRBW.Items.Add("500M");
@@ -71,11 +75,30 @@ namespace SpectrumAnalyzer
 
         void Button_Initialize()
         {
-            btnFINDHID.Text = "Find HID";
-            btnSTART.Text = "Start";
+        	btnFINDHID.Text = "Find HID";
+        	btnFINDHID.BackColor = themeSettings.Background;
+        	
+        	btnSTART.Text = "Start";
+            btnSTART.Enabled = false;
+            btnSTART.BackColor = themeSettings.ButtonErr;
+            
             btnSTOP.Text = "Stop";
+            btnSTOP.Enabled = false;
+            btnSTOP.BackColor = themeSettings.ButtonErr;
+            
             btnEXIT.Text = "Exit";
+            btnEXIT.BackColor = themeSettings.Background;
+            
             btnGETSN.Text = "Get SN";
+            btnGETSN.BackColor = themeSettings.Background;
+            
+            btnChangeDir.Text = "Set Output Directory";
+            btnChangeDir.BackColor = themeSettings.ButtonErr;
+            
+            foreach (Button btn in Controls.OfType<Button>())
+            {
+            	btn.FlatStyle = FlatStyle.Popup;
+            }
         }
 
         void TextBox_Initialize()
@@ -87,47 +110,33 @@ namespace SpectrumAnalyzer
 
         void Controls_Font_Initialize()
         {
-            lblFREQ.Font = new Font("Times New Roman", 12);
-            lblSTEP.Font = lblFREQ.Font;
-            lblRBW.Font = lblFREQ.Font;
-            lblPOINTS.Font = lblFREQ.Font;
-            lblAMP.Font = lblFREQ.Font;
-            lblSWEEPTIME.Font = lblFREQ.Font;
-
-            chkEXTATT.Font = lblFREQ.Font;
-
-            txtFREQ.Font = lblFREQ.Font;
-            txtSTEP.Font = lblFREQ.Font;
-            txtPOINTS.Font = lblFREQ.Font;
-            txtRESULT.Font = lblFREQ.Font;
-
-            cboAMP.Font = lblFREQ.Font;
-            cboRBW.Font = lblFREQ.Font;
-            cboSWEEPTIME.Font = lblFREQ.Font;
-
-            btnFINDHID.Font = lblFREQ.Font;
-            btnSTART.Font = lblFREQ.Font;
-            btnSTOP.Font = lblFREQ.Font;
-            btnEXIT.Font = lblFREQ.Font;
-            btnGETSN.Font = lblFREQ.Font;
+        	foreach (Control control in Controls)
+        	{
+        		control.Font = themeSettings.ControlFont;
+        	}
         }
 
         void Controls_Location_Initialize()
         {
-            btnFINDHID.Height = 30;
-            btnFINDHID.Width = 100;
-            btnSTART.Size = btnFINDHID.Size;
-            btnSTOP.Size = btnFINDHID.Size;
-            btnEXIT.Size = btnFINDHID.Size;
-            btnGETSN.Size = btnFINDHID.Size;
+        	var size = new Size(100, 30);
+            
+        	foreach (Button btn in Controls.OfType<Button>()) 
+			{
+				if (btn != btnChangeDir)
+					btn.Size = size;		
+			}
 
-            int span = (txtRESULT.Size.Width - btnFINDHID.Size.Width * 5) / 4;
-
-            btnFINDHID.Location = new Point(txtRESULT.Location.X, 500);
-            btnGETSN.Location = new Point(btnFINDHID.Location.X + btnFINDHID.Size.Width + span, 500);
-            btnSTART.Location = new Point(btnGETSN.Location.X + btnGETSN.Size.Width + span, 500);
-            btnSTOP.Location = new Point(btnSTART.Location.X + btnSTART.Size.Width + span, 500);
-            btnEXIT.Location = new Point(btnSTOP.Location.X + btnSTOP.Size.Width + span, 500);
+            int span =  size.Width + (txtRESULT.Size.Width - size.Width * 5) / 4;
+			
+            var x = txtRESULT.Location.X;
+            var y = txtRESULT.Location.Y + txtRESULT.Size.Height + 10;
+            
+            btnFINDHID.Location 	= new Point(x, y);
+            btnGETSN.Location 		= new Point(x + span, y);
+            btnSTART.Location 		= new Point(x + 2*span, y);
+            btnSTOP.Location 		= new Point(x + 3*span, y);
+            btnEXIT.Location 		= new Point(x + 4*span, y);
+            
         }
 
         String Return_Error_Description(Byte err)
@@ -164,10 +173,13 @@ namespace SpectrumAnalyzer
             return Err__Description;
         }
 
-        private void SpectrumAnalyzerViewController_Load(object sender, EventArgs e)
+        private void SpectrumAnalyzer_Load(object sender, EventArgs e)
         {
-            this.Text = "TSA DLL TEST";
-
+            this.Text = "Spectrum Analyzer Control Panel";
+			
+            this.BackColor = themeSettings.Background;
+            this.ForeColor = themeSettings.Foreground;
+            
             Label_Initialize();
             ComboBox_Initialize();
             CheckBox_Initialize();
@@ -175,6 +187,10 @@ namespace SpectrumAnalyzer
             TextBox_Initialize();
             Controls_Font_Initialize();
             Controls_Location_Initialize();
+            
+            this.Height = btnEXIT.Location.Y + 2 * btnEXIT.Height + 10;
+            
+            this.MinimumSize = this.Size;
 
             CheckForIllegalCrossThreadCalls = false;
 
@@ -287,7 +303,14 @@ namespace SpectrumAnalyzer
 
         private void Write_To_File(Int32 ID, Int32 Data_Length, Double[] data)
         {
-            string FILE_PATH = Application.StartupPath + "\\data.txt";
+        	string filename = System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+			
+        	string FILE_PATH;
+        	
+        	if (outputFilePath == string.Empty)
+        		FILE_PATH = Application.StartupPath + filename;
+        	else
+        		FILE_PATH = outputFilePath + filename;
 
             if (!File.Exists(FILE_PATH))
             {
@@ -297,15 +320,17 @@ namespace SpectrumAnalyzer
                 FS.Dispose();
             }
 
-            {
-                FileInfo FS = new FileInfo(FILE_PATH);
-                StreamWriter SW = FS.AppendText();
+            
+                FileInfo outputFile = new FileInfo(FILE_PATH);
+                StreamWriter SW = outputFile.AppendText();
                 SW.WriteLine("ID:" + ID);
                 SW.WriteLine("Data Length:" + Data_Length);
+                
                 for (Byte i = 0; i < Data_Length; i++)
                 { SW.WriteLine(data[i]); }
+                
                 SW.Close();
-            }
+            
         }
 
         private void btnSTOP_Click(object sender, EventArgs e)
@@ -330,7 +355,7 @@ namespace SpectrumAnalyzer
             Dispose();
         }
 
-        private void SpectrumAnalyzerViewController_FormClosing(object sender, FormClosingEventArgs e)
+        private void SpectrumAnalyzer_FormClosing(object sender, FormClosingEventArgs e)
         {
             Read_Data_Thread_Abort();
             Dispose();
@@ -346,6 +371,36 @@ namespace SpectrumAnalyzer
             }
  
         }
+		void BtnChangeDirClick(object sender, EventArgs e)
+		{
+			string folderpath = String.Empty;
+			
+			FolderBrowserDialog fbd=new FolderBrowserDialog();
+			
+			
+			DialogResult dr=fbd.ShowDialog();
+ 
+			if (dr != DialogResult.OK)
+				return;
+			
+			folderpath = fbd.SelectedPath;
+			
+			if (folderpath == String.Empty)
+				return;
+			
+			lblOutputDir.Text = folderpath;
+			
+			outputFilePath = folderpath;
+			
+		}
+	}
+	
+	public static class themeSettings
+	{
+		public static Color Background = Color.DarkSlateGray;
+		public static Color Foreground = Color.WhiteSmoke;
+		public static Color ButtonErr = Color.Maroon;
+		public static Font ControlFont = new Font(Control.DefaultFont.FontFamily, 9);
 	}
 
 }

@@ -16,7 +16,7 @@ namespace SpectrumAnalyzer
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new SpectrumAnalyzerViewController());
+			Application.Run(new SpectrumAnalyzer());
 		}
 		
 	}
