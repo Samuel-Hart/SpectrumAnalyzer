@@ -8,21 +8,21 @@ using SpectrumAnalyzerService;
 
 namespace SpectrumAnalyzer
 {
-	/// <summary>
-	/// Description of MainForm.
-	/// </summary>
-	public partial class SpectrumAnalyzer : Form
+    /// <summary>
+    /// Description of MainForm.
+    /// </summary>
+    public partial class SpectrumAnalyzer : Form
     {
-		IntPtr hDongle;
-		Thread Read_Data;
-		//Thread Write_Data;
-		bool singleFile;
-		
-		private string outputFilePath = string.Empty;
-		
-		public SpectrumAnalyzer()
+        IntPtr hDongle;
+        Thread Read_Data;
+        //Thread Write_Data;
+        bool singleFile;
+        
+        private string outputFilePath = string.Empty;
+        
+        public SpectrumAnalyzer()
         {
-			InitializeComponent();
+            InitializeComponent();
         }
 
         void Label_Initialize()
@@ -76,10 +76,10 @@ namespace SpectrumAnalyzer
 
         void Button_Initialize()
         {
-        	btnFINDHID.Text = "Find HID";
-        	btnFINDHID.BackColor = themeSettings.Background;
-        	
-        	btnSTART.Text = "Start";
+            btnFINDHID.Text = "Find HID";
+            btnFINDHID.BackColor = themeSettings.Background;
+            
+            btnSTART.Text = "Start";
             btnSTART.Enabled = false;
             btnSTART.BackColor = themeSettings.ButtonErr;
             
@@ -95,10 +95,10 @@ namespace SpectrumAnalyzer
             
             btnChangeDir.Text = "Set Output Directory";
             btnChangeDir.BackColor = themeSettings.Highlight;
-        	
+            
             foreach (Button btn in Controls.OfType<Button>())
             {
-            	btn.FlatStyle = FlatStyle.Popup;
+                btn.FlatStyle = FlatStyle.Popup;
             }
         }
 
@@ -111,24 +111,24 @@ namespace SpectrumAnalyzer
 
         void Controls_Font_Initialize()
         {
-        	foreach (Control control in Controls)
-        	{
-        		control.Font = themeSettings.ControlFont;
-        	}
+            foreach (Control control in Controls)
+            {
+                control.Font = themeSettings.ControlFont;
+            }
         }
 
         void Controls_Location_Initialize()
         {
-        	var size = new Size(100, 30);
+            var size = new Size(100, 30);
             
-        	foreach (Button btn in Controls.OfType<Button>()) 
-			{
-				if (btn != btnChangeDir)
-					btn.Size = size;		
-			}
+            foreach (Button btn in Controls.OfType<Button>()) 
+            {
+                if (btn != btnChangeDir)
+                    btn.Size = size;		
+            }
 
             int span =  size.Width + (txtRESULT.Size.Width - size.Width * 5) / 4;
-			
+            
             var x = txtRESULT.Location.X;
             var y = txtRESULT.Location.Y + txtRESULT.Size.Height + 10;
             
@@ -178,7 +178,7 @@ namespace SpectrumAnalyzer
         {
             this.Text = "Spectrum Analyzer Control Panel";
             singleFile = false;
-			
+            
             this.BackColor = themeSettings.Background;
             this.ForeColor = themeSettings.Foreground;
             
@@ -189,8 +189,8 @@ namespace SpectrumAnalyzer
             TextBox_Initialize();
             Controls_Font_Initialize();
             Controls_Location_Initialize();
-            
-            this.Height = btnEXIT.Location.Y + 2 * btnEXIT.Height + 10;
+
+            this.Height = btnEXIT.Location.Y + 2*btnEXIT.Height + SystemInformation.CaptionHeight;
             
             this.MinimumSize = this.Size;
 
@@ -200,7 +200,7 @@ namespace SpectrumAnalyzer
 
         private void btnFINDHID_Click(object sender, EventArgs e)
         {
-       		hDongle = TSA.Get_Hid_Handle();
+            hDongle = TSA.Get_Hid_Handle();
 
             if ((IntPtr)0 == hDongle)
             { txtRESULT.Text = "Can't find USB Dongle!"; }
@@ -265,48 +265,48 @@ namespace SpectrumAnalyzer
                     else
                     {
                         if (Read_Data.ThreadState == ThreadState.Aborted )
-                        	Flag = true;
+                            Flag = true;
                     }
 
-					if (Flag == true) 
-					{
-						Read_Data.Start();
+                    if (Flag) 
+                    {
+                        Read_Data.Start();
                     
-						DisableInputControls();  //Keep the user from fiddling with inputs
-					}
+                        DisableInputControls();  //Keep the user from fiddling with inputs
+                    }
                 }
                 else
-                	txtRESULT.Text = Return_Error_Description(result);
+                    txtRESULT.Text = Return_Error_Description(result);
             }
         }
 
         void Read_Data_Thread_Start()
         {
-        	int waitInterval = (int) nudInterval.Value;
-        	bool threadShouldSleep = waitInterval > 0;
-        	
-        	if (outputFilePath == string.Empty)
-        		outputFilePath = Application.StartupPath;
-        	          	            
-        	if (singleFile)
-        	{   
-        		string filename = System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
-        		string fullPath = outputFilePath + filename;
-				
-        		do{
-            		Read_Data_From_Dongle(fullPath);
-            		if (threadShouldSleep)
-            			Thread.Sleep(waitInterval);
-				} while (true);
-        	}
-        	else
-        	{
-        		do {
-        			Read_Data_From_Dongle(outputFilePath + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv");
-        			if (threadShouldSleep)
-            			Thread.Sleep(waitInterval);
-        		} while (true);
-        	}
+            int waitInterval = (int) nudInterval.Value;
+            bool threadShouldSleep = waitInterval > 0;
+            
+            if (outputFilePath == string.Empty)
+                outputFilePath = Application.StartupPath;
+                                    
+            if (singleFile)
+            {   
+                string filename = System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+                string fullPath = outputFilePath + filename;
+                
+                do{
+                    Read_Data_From_Dongle(fullPath);
+                    if (threadShouldSleep)
+                        Thread.Sleep(waitInterval);
+                } while (true);
+            }
+            else
+            {
+                do {
+                    Read_Data_From_Dongle(outputFilePath + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv");
+                    if (threadShouldSleep)
+                        Thread.Sleep(waitInterval);
+                } while (true);
+            }
         }
 
         void Read_Data_From_Dongle(string filePath)
@@ -329,8 +329,8 @@ namespace SpectrumAnalyzer
 
         private void Write_To_File(Int32 ID, Int32 Data_Length, Double[] data, string FILE_PATH)
         {
-        	bool firstTime = false;
-        	if (!File.Exists(FILE_PATH))
+            bool firstTime = false;
+            if (!File.Exists(FILE_PATH))
             {
                 FileStream FS = new FileStream(FILE_PATH, FileMode.Create);
 
@@ -344,8 +344,8 @@ namespace SpectrumAnalyzer
                 
                 if (firstTime)
                 {
-                	SW.WriteLine("ID:" + ID);
-                	SW.WriteLine("Row Format: Data Length, Data Values");
+                    SW.WriteLine("ID:" + ID);
+                    SW.WriteLine("Row Format: Data Length, Data Values");
                 }
                 
                 SW.Write(Data_Length);
@@ -353,8 +353,8 @@ namespace SpectrumAnalyzer
                 
                 for (Byte i = 0; i < Data_Length; i++)
                 { //SW.WriteLine(data[i]); }
-                	SW.Write(data[i]);
-                	SW.Write(", ");
+                    SW.Write(data[i]);
+                    SW.Write(", ");
                 }
                 SW.WriteLine();
                 
@@ -400,76 +400,77 @@ namespace SpectrumAnalyzer
             }
  
         }
-		void BtnChangeDirClick(object sender, EventArgs e)
-		{
-			string folderpath = String.Empty;
-			
-			FolderBrowserDialog fbd=new FolderBrowserDialog();
-			
-			
-			DialogResult dr=fbd.ShowDialog();
+        void BtnChangeDirClick(object sender, EventArgs e)
+        {
+            string folderpath = String.Empty;
+            
+            FolderBrowserDialog fbd=new FolderBrowserDialog();
+            
+            
+            DialogResult dr=fbd.ShowDialog();
  
-			if (dr != DialogResult.OK)
-				return;
-			
-			folderpath = fbd.SelectedPath;
-			
-			if (folderpath == String.Empty)
-				return;
-			
-			lblOutputDir.Text = folderpath;
-			
-			outputFilePath = folderpath;
-			
-			btnSTART.Enabled = true;
-			btnSTART.BackColor = themeSettings.Background;
-			btnSTOP.Enabled = true;
-			btnSTOP.BackColor = themeSettings.Background;
-			
-			foreach (Button btn in Controls.OfType<Button>())
-			{	
-				btn.BackColor = !btn.Enabled ? themeSettings.ButtonErr : themeSettings.Background;
-			}
-			
-		}
-		
-		void RdoManyFilesCheckedChanged(object sender, EventArgs e)
-		{
-			rdoSingleFile.Checked = !rdoManyFiles.Checked;
-			singleFile = rdoSingleFile.Checked;
-		}
-		
-		private void DisableInputControls()
-		{
-			foreach (Control ctrl in Controls)
-			{	
-				if (!(ctrl is Label))
-					ctrl.Enabled = false;
-			}
-			
-			btnSTOP.Enabled = true;
-			btnEXIT.Enabled = true;
-			txtRESULT.Enabled = true;
+            if (dr != DialogResult.OK)
+                return;
+            
+            folderpath = fbd.SelectedPath;
+            
+            if (folderpath == String.Empty)
+                return;
+            
+            lblOutputDir.Text = folderpath;
+            
+            outputFilePath = folderpath;
+            
+            btnSTART.Enabled = true;
+            btnSTART.BackColor = themeSettings.Background;
+            btnSTOP.Enabled = true;
+            btnSTOP.BackColor = themeSettings.Background;
+            
+            foreach (Button btn in Controls.OfType<Button>())
+            {	
+                btn.BackColor = !btn.Enabled ? themeSettings.ButtonErr : themeSettings.Background;
+            }
+            
+        }
+        
+        void RdoManyFilesCheckedChanged(object sender, EventArgs e)
+        {
+            rdoSingleFile.Checked = !rdoManyFiles.Checked;
+            singleFile = rdoSingleFile.Checked;
+        }
+        
+        private void DisableInputControls()
+        {
+            foreach (Control ctrl in Controls)
+            {	
+                if (!(ctrl is Label))
+                    ctrl.Enabled = false;
+            }
+            
+            btnSTOP.Enabled = true;
+            btnEXIT.Enabled = true;
+            txtRESULT.Enabled = true;
 
-			foreach (Button btn in Controls.OfType<Button>())
-			{	if (!btn.Enabled)
-					btn.BackColor = themeSettings.ButtonErr;
-				else
-					btn.BackColor = themeSettings.Highlight;
-			}
-			
-			btnSTOP.Focus();
-		}
-	}
-	
-	public static class themeSettings
-	{
-		public static Color Background = Color.WhiteSmoke;
-		public static Color Foreground = Color.DarkSlateGray;
-		public static Color ButtonErr = Color.LightSlateGray;
-		public static Color Highlight = Color.LightSkyBlue;
-		public static Font ControlFont = new Font(Control.DefaultFont.FontFamily, 9);
-		
-	}
+            foreach (Button btn in Controls.OfType<Button>())
+            {	if (!btn.Enabled)
+                    btn.BackColor = themeSettings.ButtonErr;
+                else
+                    btn.BackColor = themeSettings.Highlight;
+            }
+            
+            btnSTOP.Focus();
+        }
+
+    }
+
+    public static class themeSettings
+    {
+        public static Color Background = Color.WhiteSmoke;
+        public static Color Foreground = Color.DarkSlateGray;
+        public static Color ButtonErr = Color.LightSlateGray;
+        public static Color Highlight = Color.LightSkyBlue;
+        public static Font ControlFont = new Font(Control.DefaultFont.FontFamily, 9);
+        
+    }
 
 }

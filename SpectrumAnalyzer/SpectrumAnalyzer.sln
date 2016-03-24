@@ -1,10 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-# SharpDevelop 5.1
-VisualStudioVersion = 12.0.20827.3
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectrumAnalyzer", "..\SpectrumAnalyzerClient\SpectrumAnalyzer.csproj", "{88214D26-2A23-4BE9-81D0-E2C3A2A9BD08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectrumAnalyzer", "SpectrumAnalyzer.csproj", "{88214D26-2A23-4BE9-81D0-E2C3A2A9BD08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,5 +15,8 @@ Global
 		{88214D26-2A23-4BE9-81D0-E2C3A2A9BD08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88214D26-2A23-4BE9-81D0-E2C3A2A9BD08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88214D26-2A23-4BE9-81D0-E2C3A2A9BD08}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
