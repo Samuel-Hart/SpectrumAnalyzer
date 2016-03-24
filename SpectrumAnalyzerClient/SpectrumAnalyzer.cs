@@ -16,6 +16,7 @@ namespace SpectrumAnalyzer
 		IntPtr hDongle;
 		Thread Read_Data;
 		//Thread Write_Data;
+		bool singleFile;
 		
 		private string outputFilePath = string.Empty;
 		
@@ -93,8 +94,8 @@ namespace SpectrumAnalyzer
             btnGETSN.BackColor = themeSettings.Background;
             
             btnChangeDir.Text = "Set Output Directory";
-            btnChangeDir.BackColor = themeSettings.ButtonErr;
-            
+            btnChangeDir.BackColor = themeSettings.Highlight;
+        	
             foreach (Button btn in Controls.OfType<Button>())
             {
             	btn.FlatStyle = FlatStyle.Popup;
@@ -176,6 +177,7 @@ namespace SpectrumAnalyzer
         private void SpectrumAnalyzer_Load(object sender, EventArgs e)
         {
             this.Text = "Spectrum Analyzer Control Panel";
+            singleFile = false;
 			
             this.BackColor = themeSettings.Background;
             this.ForeColor = themeSettings.Foreground;
@@ -203,7 +205,7 @@ namespace SpectrumAnalyzer
             if ((IntPtr)0 == hDongle)
             { txtRESULT.Text = "Can't find USB Dongle!"; }
             else
-            { txtRESULT.Text = "Find USB Dongle! The handle is " + hDongle.ToString(); }
+            { txtRESULT.Text = "Found USB Dongle! The handle is " + hDongle.ToString(); }
         }
 
         private void btnGETSN_Click(object sender, EventArgs e)
@@ -247,14 +249,14 @@ namespace SpectrumAnalyzer
 
                 Byte result = TSA.Start_Dongle(hDongle, C_FREQ, STEP, iRBW, POINTS, AMP, SWEEP_TIME, EXT_ATT, ref bytDIR_PATH[0]);
 
-                if (0 == result)
+                if (result == 0)
                 {
                     txtRESULT.Text = "Start Dongle";
 
                     bool Flag;
                     Flag = false;
 
-                    if  ((Read_Data ==null)||(Read_Data.IsAlive == false))
+                    if  ((Read_Data == null)||(Read_Data.IsAlive == false))
                     {
                         Read_Data = new Thread(new ThreadStart(Read_Data_Thread_Start));
                         Read_Data.IsBackground = true;
@@ -263,27 +265,51 @@ namespace SpectrumAnalyzer
                     else
                     {
                         if (Read_Data.ThreadState == ThreadState.Aborted )
-                        {Flag = true;}
+                        	Flag = true;
                     }
 
-                    if (Flag == true) { Read_Data.Start(); }
-
+					if (Flag == true) 
+					{
+						Read_Data.Start();
                     
+						DisableInputControls();  //Keep the user from fiddling with inputs
+					}
                 }
                 else
-                { txtRESULT.Text = Return_Error_Description(result); }
+                	txtRESULT.Text = Return_Error_Description(result);
             }
         }
 
         void Read_Data_Thread_Start()
         {
-            do
-            {
-                Read_Data_From_Dongle();
-            } while (true);
+        	int waitInterval = (int) nudInterval.Value;
+        	bool threadShouldSleep = waitInterval > 0;
+        	
+        	if (outputFilePath == string.Empty)
+        		outputFilePath = Application.StartupPath;
+        	          	            
+        	if (singleFile)
+        	{   
+        		string filename = System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+        		string fullPath = outputFilePath + filename;
+				
+        		do{
+            		Read_Data_From_Dongle(fullPath);
+            		if (threadShouldSleep)
+            			Thread.Sleep(waitInterval);
+				} while (true);
+        	}
+        	else
+        	{
+        		do {
+        			Read_Data_From_Dongle(outputFilePath + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv");
+        			if (threadShouldSleep)
+            			Thread.Sleep(waitInterval);
+        		} while (true);
+        	}
         }
 
-        void Read_Data_From_Dongle()
+        void Read_Data_From_Dongle(string filePath)
         {
             Int32 ID = 0;
             Int32 Data_Length = 0;
@@ -298,36 +324,39 @@ namespace SpectrumAnalyzer
             for (Byte i = 0; i < Data_Length; i++)
             { txtRESULT.Text = txtRESULT.Text + data[i] + "   "; }
 
-            Write_To_File(ID, Data_Length, data);
+            Write_To_File(ID, Data_Length, data, filePath);
         }
 
-        private void Write_To_File(Int32 ID, Int32 Data_Length, Double[] data)
+        private void Write_To_File(Int32 ID, Int32 Data_Length, Double[] data, string FILE_PATH)
         {
-        	string filename = System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
-			
-        	string FILE_PATH;
-        	
-        	if (outputFilePath == string.Empty)
-        		FILE_PATH = Application.StartupPath + filename;
-        	else
-        		FILE_PATH = outputFilePath + filename;
-
-            if (!File.Exists(FILE_PATH))
+        	bool firstTime = false;
+        	if (!File.Exists(FILE_PATH))
             {
                 FileStream FS = new FileStream(FILE_PATH, FileMode.Create);
 
                 FS.Close();
                 FS.Dispose();
+                firstTime = true;
             }
 
-            
                 FileInfo outputFile = new FileInfo(FILE_PATH);
                 StreamWriter SW = outputFile.AppendText();
-                SW.WriteLine("ID:" + ID);
-                SW.WriteLine("Data Length:" + Data_Length);
+                
+                if (firstTime)
+                {
+                	SW.WriteLine("ID:" + ID);
+                	SW.WriteLine("Row Format: Data Length, Data Values");
+                }
+                
+                SW.Write(Data_Length);
+                SW.Write(", ");
                 
                 for (Byte i = 0; i < Data_Length; i++)
-                { SW.WriteLine(data[i]); }
+                { //SW.WriteLine(data[i]); }
+                	SW.Write(data[i]);
+                	SW.Write(", ");
+                }
+                SW.WriteLine();
                 
                 SW.Close();
             
@@ -392,15 +421,55 @@ namespace SpectrumAnalyzer
 			
 			outputFilePath = folderpath;
 			
+			btnSTART.Enabled = true;
+			btnSTART.BackColor = themeSettings.Background;
+			btnSTOP.Enabled = true;
+			btnSTOP.BackColor = themeSettings.Background;
+			
+			foreach (Button btn in Controls.OfType<Button>())
+			{	
+				btn.BackColor = !btn.Enabled ? themeSettings.ButtonErr : themeSettings.Background;
+			}
+			
+		}
+		
+		void RdoManyFilesCheckedChanged(object sender, EventArgs e)
+		{
+			rdoSingleFile.Checked = !rdoManyFiles.Checked;
+			singleFile = rdoSingleFile.Checked;
+		}
+		
+		private void DisableInputControls()
+		{
+			foreach (Control ctrl in Controls)
+			{	
+				if (!(ctrl is Label))
+					ctrl.Enabled = false;
+			}
+			
+			btnSTOP.Enabled = true;
+			btnEXIT.Enabled = true;
+			txtRESULT.Enabled = true;
+
+			foreach (Button btn in Controls.OfType<Button>())
+			{	if (!btn.Enabled)
+					btn.BackColor = themeSettings.ButtonErr;
+				else
+					btn.BackColor = themeSettings.Highlight;
+			}
+			
+			btnSTOP.Focus();
 		}
 	}
 	
 	public static class themeSettings
 	{
-		public static Color Background = Color.DarkSlateGray;
-		public static Color Foreground = Color.WhiteSmoke;
-		public static Color ButtonErr = Color.Maroon;
+		public static Color Background = Color.WhiteSmoke;
+		public static Color Foreground = Color.DarkSlateGray;
+		public static Color ButtonErr = Color.LightSlateGray;
+		public static Color Highlight = Color.LightSkyBlue;
 		public static Font ControlFont = new Font(Control.DefaultFont.FontFamily, 9);
+		
 	}
 
 }

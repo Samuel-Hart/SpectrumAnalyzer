@@ -53,8 +53,12 @@ namespace SpectrumAnalyzer
 			this.btnChangeDir = new System.Windows.Forms.Button();
 			this.nudInterval = new System.Windows.Forms.NumericUpDown();
 			this.lblScanInterval = new System.Windows.Forms.Label();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.rdoSingleFile = new System.Windows.Forms.RadioButton();
+			this.rdoManyFiles = new System.Windows.Forms.RadioButton();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nudInterval)).BeginInit();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btnFINDHID
@@ -228,10 +232,9 @@ namespace SpectrumAnalyzer
 			// groupBox1
 			// 
 			this.groupBox1.Controls.Add(this.lblOutputDir);
-			this.groupBox1.Controls.Add(this.btnChangeDir);
-			this.groupBox1.Location = new System.Drawing.Point(12, 146);
+			this.groupBox1.Location = new System.Drawing.Point(12, 152);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(688, 102);
+			this.groupBox1.Size = new System.Drawing.Size(688, 60);
 			this.groupBox1.TabIndex = 19;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Current Output Directory";
@@ -248,9 +251,9 @@ namespace SpectrumAnalyzer
 			// 
 			// btnChangeDir
 			// 
-			this.btnChangeDir.Location = new System.Drawing.Point(6, 63);
+			this.btnChangeDir.Location = new System.Drawing.Point(12, 215);
 			this.btnChangeDir.Name = "btnChangeDir";
-			this.btnChangeDir.Size = new System.Drawing.Size(676, 33);
+			this.btnChangeDir.Size = new System.Drawing.Size(688, 33);
 			this.btnChangeDir.TabIndex = 1;
 			this.btnChangeDir.Text = "Change Output Directory";
 			this.btnChangeDir.UseVisualStyleBackColor = true;
@@ -283,12 +286,46 @@ namespace SpectrumAnalyzer
 			this.lblScanInterval.TabIndex = 21;
 			this.lblScanInterval.Text = "Time Between Scans (ms)";
 			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.rdoSingleFile);
+			this.groupBox2.Controls.Add(this.rdoManyFiles);
+			this.groupBox2.Location = new System.Drawing.Point(285, 105);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(415, 47);
+			this.groupBox2.TabIndex = 22;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Ouput Option";
+			// 
+			// rdoSingleFile
+			// 
+			this.rdoSingleFile.Checked = true;
+			this.rdoSingleFile.Location = new System.Drawing.Point(225, 17);
+			this.rdoSingleFile.Name = "rdoSingleFile";
+			this.rdoSingleFile.Size = new System.Drawing.Size(149, 24);
+			this.rdoSingleFile.TabIndex = 1;
+			this.rdoSingleFile.TabStop = true;
+			this.rdoSingleFile.Text = "One File Per Session";
+			this.rdoSingleFile.UseVisualStyleBackColor = true;
+			// 
+			// rdoManyFiles
+			// 
+			this.rdoManyFiles.Location = new System.Drawing.Point(27, 17);
+			this.rdoManyFiles.Name = "rdoManyFiles";
+			this.rdoManyFiles.Size = new System.Drawing.Size(155, 24);
+			this.rdoManyFiles.TabIndex = 0;
+			this.rdoManyFiles.Text = "One File Per Scan";
+			this.rdoManyFiles.UseVisualStyleBackColor = true;
+			this.rdoManyFiles.CheckedChanged += new System.EventHandler(this.RdoManyFilesCheckedChanged);
+			// 
 			// SpectrumAnalyzer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.WindowFrame;
 			this.ClientSize = new System.Drawing.Size(712, 599);
+			this.Controls.Add(this.groupBox2);
+			this.Controls.Add(this.btnChangeDir);
 			this.Controls.Add(this.nudInterval);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.chkEXTATT);
@@ -322,6 +359,7 @@ namespace SpectrumAnalyzer
 			this.Load += new System.EventHandler(this.SpectrumAnalyzer_Load);
 			this.groupBox1.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.nudInterval)).EndInit();
+			this.groupBox2.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -352,6 +390,9 @@ namespace SpectrumAnalyzer
         private System.Windows.Forms.Label lblOutputDir;
         private System.Windows.Forms.NumericUpDown nudInterval;
         private System.Windows.Forms.Label lblScanInterval;
+		private System.Windows.Forms.GroupBox groupBox2;
+		private System.Windows.Forms.RadioButton rdoSingleFile;
+		private System.Windows.Forms.RadioButton rdoManyFiles;
     }
 
 	
